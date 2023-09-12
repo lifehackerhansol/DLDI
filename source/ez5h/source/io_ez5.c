@@ -142,14 +142,14 @@ uint32      dsCardi_Read4ByteMode(uint8 * command)
 uint32  SD_SendCommand (int type , unsigned int param )
 {
     uint8 command[8];
-    command[0]= (param)&0xFF;
-    command[1]= (param>>8)&0xFF;
-    command[2]= (param>>16)&0xFF;
-    command[3]= (param>>24)&0xFF;
-    command[4]= 0x40 | (type&0xFF);
-    command[5]= 0x00;
-    command[6]= 0xFA; 
     command[7]= 0xB8;
+    command[6]= 0xFA; 
+    command[5]= 0x00;
+    command[4]= 0x40 | (type&0xFF);
+    command[3]= (param>>24)&0xFF;
+    command[2]= (param>>16)&0xFF;
+    command[1]= (param>>8)&0xFF;
+    command[0]= (param)&0xFF;
     return dsCardi_Read4ByteMode(command);
 }
 //---------------------------------------------
@@ -163,14 +163,14 @@ bool SD_ReadResponse(unsigned char *ppbuf,int len)
     
     //等待起始标志位置
     WAIT_CR &= ~0x0800;
-    command[0]= 0x00;
-    command[1]= 0x00;
-    command[2]= 0x00;
-    command[3]= 0x00;
-    command[4]= 0x00;
-    command[5]= 0x01;
-    command[6]= 0xFA;
     command[7]= 0xB8;
+    command[6]= 0xFA;
+    command[5]= 0x01;
+    command[4]= 0x00;
+    command[3]= 0x00;
+    command[2]= 0x00;
+    command[1]= 0x00;
+    command[0]= 0x00;
     
     do
     {
@@ -185,14 +185,14 @@ bool SD_ReadResponse(unsigned char *ppbuf,int len)
    
     if(len==6)
     {
-        command[0]= 0x00;
-        command[1]= 0x00;
-        command[2]= 0x00;
-        command[3]= 0x00;
-        command[4]= 0x00;
-        command[5]= 0x02;
-        command[6]= 0xFA;
         command[7]= 0xB8;
+        command[6]= 0xFA;
+        command[5]= 0x02;
+        command[4]= 0x00;
+        command[3]= 0x00;
+        command[2]= 0x00;
+        command[1]= 0x00;
+        command[0]= 0x00;
         status = dsCardi_Read4ByteMode(command);
         
         ppbuf[3] = p[0];
@@ -202,14 +202,14 @@ bool SD_ReadResponse(unsigned char *ppbuf,int len)
     }
     else if(len==17)
     {   
-        command[0]= 0x00;
-        command[1]= 0x00;
-        command[2]= 0x00;
-        command[3]= 0x00;
-        command[4]= 0x00;
-        command[5]= 0x02;
-        command[6]= 0xFA;
         command[7]= 0xB8;
+        command[6]= 0xFA;
+        command[5]= 0x02;
+        command[4]= 0x00;
+        command[3]= 0x00;
+        command[2]= 0x00;
+        command[1]= 0x00;
+        command[0]= 0x00;
         status = dsCardi_Read4ByteMode(command);
         
         ppbuf[3] = p[0];
@@ -218,42 +218,42 @@ bool SD_ReadResponse(unsigned char *ppbuf,int len)
         ppbuf[6] = p[3];
         
         
-        command[0]= 0x00;
-        command[1]= 0x00;
-        command[2]= 0x00;
-        command[3]= 0x00;
-        command[4]= 0x00;
-        command[5]= 0x03;
-        command[6]= 0xFA;
         command[7]= 0xB8;
+        command[6]= 0xFA;
+        command[5]= 0x03;
+        command[4]= 0x00;
+        command[3]= 0x00;
+        command[2]= 0x00;
+        command[1]= 0x00;
+        command[0]= 0x00;
         status = dsCardi_Read4ByteMode(command);
         ppbuf[7] = p[0];
         ppbuf[8] = p[1];
         ppbuf[9] = p[2];
         ppbuf[10] = p[3];
         
-        command[0]= 0x00;
-        command[1]= 0x00;
-        command[2]= 0x00;
-        command[3]= 0x00;
-        command[4]= 0x00;
-        command[5]= 0x04;
-        command[6]= 0xFA;
         command[7]= 0xB8;
+        command[6]= 0xFA;
+        command[5]= 0x04;
+        command[4]= 0x00;
+        command[3]= 0x00;
+        command[2]= 0x00;
+        command[1]= 0x00;
+        command[0]= 0x00;
         status = dsCardi_Read4ByteMode(command);
         ppbuf[11] = p[0];
         ppbuf[12] = p[1];
         ppbuf[13] = p[2];
         ppbuf[14] = p[3];
         
-        command[0]= 0x00;
-        command[1]= 0x00;
-        command[2]= 0x00;
-        command[3]= 0x00;
-        command[4]= 0x00;
-        command[5]= 0x05;
-        command[6]= 0xFA;
         command[7]= 0xB8;
+        command[6]= 0xFA;
+        command[5]= 0x05;
+        command[4]= 0x00;
+        command[3]= 0x00;
+        command[2]= 0x00;
+        command[1]= 0x00;
+        command[0]= 0x00;
         status = dsCardi_Read4ByteMode(command);
         ppbuf[15] = p[0];
         ppbuf[16] = p[1];
@@ -273,14 +273,14 @@ bool SD_WaitOK()
     uint32 status ;
     WAIT_CR &= ~0x0800;
     uint8 command[8];
-    command[0]= 0x00;
-    command[1]= 0x00;
-    command[2]= 0x00;
-    command[3]= 0x00;
-    command[4]= 0x00;
-    command[5]= 0x01;
-    command[6]= 0xFA;
     command[7]= 0xB8;
+    command[6]= 0xFA;
+    command[5]= 0x01;
+    command[4]= 0x00;
+    command[3]= 0x00;
+    command[2]= 0x00;
+    command[1]= 0x00;
+    command[0]= 0x00;
     do{
         status = dsCardi_Read4ByteMode(command);
     }while(status & 0x000000FF);
@@ -295,27 +295,27 @@ void SD_WriteData(unsigned char *ppbuf, int len,int wait)
     WAIT_CR &= ~0x0800;
     uint8 command[8];
     int i=0;
-    command[0]= 0x00;
-    command[1]= 0x00;
-    command[2]= 0xF0;
-    command[3]= 0xFF;
-    command[4]= 0xFF;
-    command[5]= 0xFF;
-    command[6]= 0xF6; 
     command[7]= 0xB8;
+    command[6]= 0xF6; 
+    command[5]= 0xFF;
+    command[4]= 0xFF;
+    command[3]= 0xFF;
+    command[2]= 0xF0;
+    command[1]= 0x00;
+    command[0]= 0x00;
     status = dsCardi_Read4ByteMode(command);
 
     WAIT_CR &= ~0x0800;
    for(i=0;i<len;i+=2)
     {
-        command[0]= 0x00;
-        command[1]= 0x00;
-        command[2]= ppbuf[i+1] | 0xF0;
-        command[3]= (ppbuf[i+1]>>4) | 0xF0;
-        command[4]= ppbuf[i] | 0xF0;
-        command[5]= (ppbuf[i]>>4) | 0xF0;
-        command[6]= 0xF6; 
         command[7]= 0xB8;
+        command[6]= 0xF6; 
+        command[5]= (ppbuf[i]>>4) | 0xF0;
+        command[4]= ppbuf[i] | 0xF0;
+        command[3]= (ppbuf[i+1]>>4) | 0xF0;
+        command[2]= ppbuf[i+1] | 0xF0;
+        command[1]= 0x00;
+        command[0]= 0x00;
         cardWriteCommand(command);
         REG_ROMCTRL = 0xA0586000 ;
         status = REG_ROMCTRL; //0x40001a4
@@ -323,40 +323,40 @@ void SD_WriteData(unsigned char *ppbuf, int len,int wait)
     do
     {
         WAIT_CR &= ~0x0800;
-        command[0]= 0x00;
-        command[1]= 0x00;
-        command[2]= 0x00;
-        command[3]= 0x00;
-        command[4]= 0x00;
-        command[5]= 0x00;
-        command[6]= 0xF8;
         command[7]= 0xB8;
+        command[6]= 0xF8;
+        command[5]= 0x00;
+        command[4]= 0x00;
+        command[3]= 0x00;
+        command[2]= 0x00;
+        command[1]= 0x00;
+        command[0]= 0x00;
         status = dsCardi_Read4ByteMode(command);
     }while(status & 0x00000001);
 
 //读CRC状态
     WAIT_CR &= ~0x0800;
-    command[0]= 0x00;
-    command[1]= 0x00;
-    command[2]= 0x00;
-    command[3]= 0x00;
-    command[4]= 0x00;
-    command[5]= 0x00;
-    command[6]= 0xF8;
     command[7]= 0xB8;
+    command[6]= 0xF8;
+    command[5]= 0x00;
+    command[4]= 0x00;
+    command[3]= 0x00;
+    command[2]= 0x00;
+    command[1]= 0x00;
+    command[0]= 0x00;
     status = dsCardi_Read4ByteMode(command);
     
     do
     {
         WAIT_CR &= ~0x0800;
-        command[0]= 0x00;
-        command[1]= 0x00;
-        command[2]= 0x00;
-        command[3]= 0x00;
-        command[4]= 0x00;
-        command[5]= 0x00;
-        command[6]= 0xF8;
         command[7]= 0xB8;
+        command[6]= 0xF8;
+        command[5]= 0x00;
+        command[4]= 0x00;
+        command[3]= 0x00;
+        command[2]= 0x00;
+        command[1]= 0x00;
+        command[0]= 0x00;
         status = dsCardi_Read4ByteMode(command);
     }while((status & 0x00000001)!=0x01);
 }
@@ -422,14 +422,14 @@ bool    SD_WriteSingleBlock(unsigned int address , unsigned char *ppbuf, int len
 
     //这里是随便加一个读，解决时间问题
     uint8 command[8];   
-    command[0]= 0x00;
-    command[1]= 0x00;
-    command[2]= 0x00;
-    command[3]= 0x00;
-    command[4]= 0x00;
-    command[5]= 0x01;
-    command[6]= 0xFA;
     command[7]= 0xB8;   
+    command[6]= 0xFA;
+    command[5]= 0x01;
+    command[4]= 0x00;
+    command[3]= 0x00;
+    command[2]= 0x00;
+    command[1]= 0x00;
+    command[0]= 0x00;
     dsCardi_Read4ByteMode(command);
     
     WAIT_CR &= ~0x0800;
@@ -448,14 +448,14 @@ bool SD_ReadData(unsigned char *ppbuf, int len,int wait)
  
     //等待起始标志位置
     
-    command[0]= 0x00;
-    command[1]= 0x00;
-    command[2]= 0x00;
-    command[3]= 0x00;
-    command[4]= 0x00;
-    command[5]= 0x01;
-    command[6]= 0xFA;
     command[7]= 0xB8;
+    command[6]= 0xFA;
+    command[5]= 0x01;
+    command[4]= 0x00;
+    command[3]= 0x00;
+    command[2]= 0x00;
+    command[1]= 0x00;
+    command[0]= 0x00;
     do{
         status = dsCardi_Read4ByteMode(command);
         wait -- ;
@@ -468,14 +468,14 @@ bool SD_ReadData(unsigned char *ppbuf, int len,int wait)
     //读512 Byte数据
     WAIT_CR &= ~0x0800;
   
-    command[0]= 0x00;
-    command[1]= 0x00;
-    command[2]= 0x00;
-    command[3]= 0x00;
-    command[4]= 0x00;
-    command[5]= 0x00;
-    command[6]= 0xF7;
     command[7]= 0xB8;
+    command[6]= 0xF7;
+    command[5]= 0x00;
+    command[4]= 0x00;
+    command[3]= 0x00;
+    command[2]= 0x00;
+    command[1]= 0x00;
+    command[0]= 0x00;
     dsCardi_SetRomOP(command);
     REG_ROMCTRL = 0xA1586000 ;
     if((uint32)ppbuf&0x3)
@@ -542,14 +542,14 @@ uint32 dsCardi_ReadSram(uint32 address)
 {
 	address += 0x80000;
     uint8 command[8];
-    command[0]= 0x00;
-    command[1]= 0x00;
-    command[2]= 0x00;
-    command[3]= address;
-    command[4]= address>>8;
-    command[5]= address>>16;
-    command[6]= 0x01;
     command[7]= 0xB7;
+    command[6]= 0x01;
+    command[5]= address>>16;
+    command[4]= address>>8;
+    command[3]= address;
+    command[2]= 0x00;
+    command[1]= 0x00;
+    command[0]= 0x00;
     return dsCardi_Read4ByteMode(command);
 }
 bool SD_initial()
