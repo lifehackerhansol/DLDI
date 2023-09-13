@@ -33,7 +33,7 @@ CFLAGS	:=	-g -Wall -O2\
 			-ffast-math \
 			$(ARCH)
 
-CFLAGS	+=	-DDLDI
+CFLAGS	+=	-DDLDI -DCCITT_TABLE
 CFLAGS	+=	$(INCLUDE) -DARM7 -fPIC
 
 CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions
