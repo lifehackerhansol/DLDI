@@ -50,8 +50,8 @@ bool ioEZ5_FlushResponse(void)
 void ioEZ5_GetCCITTForWriteBuffer(u8 *ccittResults, u8 *buffer)
 {
 	ALIGN(4) u8 crcBuffer[128];
-	unsigned char w1,w2,w3,w4 ;
-	unsigned short b1,b2,b3,b4 ;
+	u8 w1,w2,w3,w4 ;
+	u16 b1,b2,b3,b4 ;
 
 	for(int i=0;i<512;i+=4)
 	{
@@ -213,7 +213,10 @@ bool ioEZ5_SDWriteSector(u32 sector, const void *buffer)
 	u64 command = 0;
 	for (u32 i=0; i < 520; i += 2) {
 		command = IOEZ5_CMD_SDMC_WRITE_DATA(writeData + i);
-		ioEZ5_ReadCardData(command, IOEZ5_CTRL_READ_0, NULL, 0);
+		
+		card_romSetCmd(command);
+		card_romStartXfer(IOEZ5_CTRL_READ_0, false);
+		while(card_romIsBusy());
 	}
 
 	// Read write status
