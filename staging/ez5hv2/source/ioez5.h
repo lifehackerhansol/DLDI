@@ -67,7 +67,7 @@ static inline u64 IOEZ5_CMD_SDIO_WRITE_SINGLE_BLOCK(u32 sector)
 	return IOEZ5_CMD_SDIO(24, sector);
 }
 
-#define IOEZ5_CMD_SDMC_WRITE_DATA_START (IOEZ5_CMD_SDMC | (0x6ull << 48) | 0xFFFFF0ull << 16)
+#define IOEZ5_CMD_SDMC_WRITE_DATA_START (IOEZ5_CMD_SDMC | (0x6ull << 48) | 0xFFFFFFF0ull << 16)
 
 static inline u64 IOEZ5_CMD_SDMC_WRITE_DATA(const u8 *data)
 {
