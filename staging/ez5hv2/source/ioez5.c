@@ -14,7 +14,6 @@
 
 #include "ccitt.h"
 #include "ioez5.h"
-#include "tonccpy.h"
 
 static inline void ioEZ5_ReadCardData(u64 command, u32 flags, void *buffer, u32 length)
 {
@@ -192,13 +191,10 @@ bool ioEZ5_SDReadSector(u32 sector, void *buffer)
 
 bool ioEZ5_SDWriteSector(u32 sector, const void *buffer)
 {
-	ALIGN(4) u8 writeData[520];
 	ALIGN(4) u8 ccittResults[8];
 
-	// set up buffer for single write
-	tonccpy(writeData, buffer, 0x200);
+	// calculate CRC for write buffer
 	ioEZ5_GetCCITTForWriteBuffer(ccittResults, (u8*)buffer);
-	tonccpy(writeData + 0x200, ccittResults, 8);
 
 	// CMD24
 	ioEZ5_SendCommand(IOEZ5_CMD_SDIO_WRITE_SINGLE_BLOCK(sector));
@@ -210,21 +206,25 @@ bool ioEZ5_SDWriteSector(u32 sector, const void *buffer)
 	// actually start write
 	ioEZ5_SendCommand(IOEZ5_CMD_SDMC_WRITE_DATA_START);
 
-	u64 command = 0;
-	for (u32 i=0; i < 520; i += 2) {
-		command = IOEZ5_CMD_SDMC_WRITE_DATA(writeData + i);
-		
-		card_romSetCmd(command);
-		card_romStartXfer(IOEZ5_CTRL_READ_0, false);
-		while(card_romIsBusy());
-	}
+	// send write data
+    for (u32 i=0; i < 512; i += 2) {
+        card_romSetCmd(IOEZ5_CMD_SDMC_WRITE_DATA(buffer + i));
+        card_romStartXfer(IOEZ5_CTRL_READ_0, false);
+        while(card_romIsBusy());
+    }
+	// send CRC data
+    for (u32 i=0; i < 8; i += 2) {
+        card_romSetCmd(IOEZ5_CMD_SDMC_WRITE_DATA(ccittResults + i));
+        card_romStartXfer(IOEZ5_CTRL_READ_0, false);
+        while(card_romIsBusy());
+    }
 
 	// Read write status
-	while(ioEZ5_SendCommand(IOEZ5_CMD_WAIT_WRITE_BUSY()) & 0xFF);
+	while(ioEZ5_SendCommand(IOEZ5_CMD_WAIT_WRITE_BUSY()) & 0x1);
 
 	// Read CRC status
 	ioEZ5_SendCommand(IOEZ5_CMD_WAIT_WRITE_BUSY());
-	while(ioEZ5_SendCommand(IOEZ5_CMD_WAIT_WRITE_BUSY()) & 0xFF);
+	while((ioEZ5_SendCommand(IOEZ5_CMD_WAIT_WRITE_BUSY()) & 0x1) != 0x1);
 
 	// Wait until it's all nice and done
 	while(ioEZ5_SendCommand(IOEZ5_CMD_WAIT_BUSY()));
