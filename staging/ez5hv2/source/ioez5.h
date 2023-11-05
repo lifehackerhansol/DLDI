@@ -81,4 +81,4 @@ static inline u64 IOEZ5_CMD_SDMC_WRITE_DATA(const u8 *data)
 
 // user API
 bool ioEZ5_SDReadSector(u32 sector, void *buffer);
-bool ioEZ5_SDWriteSector(u32 sector, const void *buffer);
+bool ioEZ5_SDWriteSector(u32 sector, const u8 *buffer);
