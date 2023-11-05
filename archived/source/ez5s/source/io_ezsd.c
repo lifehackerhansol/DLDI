@@ -31,7 +31,7 @@ void  SetNandControl(uint16  control)
 }
 /********************************************************************************/
 
-u32 SDadd ; //´ËÈ«¾Ö±äÁ¿Îª¹µÍ¨µÄSDµØÖ·
+u32 SDadd ; //æ­¤å…¨å±€å˜é‡ä¸ºæ²Ÿé€šçš„SDåœ°å€
 
 
 //Function:	CRC:X^16+X^12+X^5+1
@@ -135,7 +135,7 @@ bool SD_ReadResponse(unsigned char *ppbuf,int len,int wait)
 	uint8 *p;
 	p = (uint8 *)(&temp);
 	
-	//µÈ´ıÆğÊ¼±êÖ¾Î»ÖÃ
+	//ç­‰å¾…èµ·å§‹æ ‡å¿—ä½ç½®
 	REG_EXMEMCNT &= ~0x0800;
 	command[0]= 0x00;
 	command[1]= 0x00;
@@ -305,7 +305,7 @@ void SD_ReadData(unsigned char *ppbuf, int len,int wait)
 	unsigned char *p;
 	p = (unsigned char *)(&temp);
 
-	//µÈ´ıÆğÊ¼±êÖ¾Î»ÖÃ
+	//ç­‰å¾…èµ·å§‹æ ‡å¿—ä½ç½®
 	REG_EXMEMCNT &= ~0x0800;
 	command[0]= 0x00;
 	command[1]= 0x00;
@@ -329,7 +329,7 @@ void SD_ReadData(unsigned char *ppbuf, int len,int wait)
 		temp = CARD_DATA_RD;
 		temp1= CARD_DATA;		
 	}while(temp & 0x000000FF);
-	//¶Á512 ByteÊı¾İ
+	//è¯»512 Byteæ•°æ®
 	command[0]= 0x00;
 	command[1]= 0x00;
 	command[2]= 0x00;
@@ -484,7 +484,7 @@ void SD_ReadLoop(int lp)
 }
 bool SD_WaitOK()
 {
-	//µÈ´ıÆğÊ¼±êÖ¾Î»ÖÃ
+	//ç­‰å¾…èµ·å§‹æ ‡å¿—ä½ç½®
 	uint32 temp,temp1;
 	REG_EXMEMCNT &= ~0x0800;
 	uint8 command[8];
@@ -566,7 +566,7 @@ bool	SD_WriteSingleBlock(unsigned int address , unsigned char *ppbuf, int len)
 		+((w1&0x4)<<1)+((w2&0x4))+((w3&0x4)>>1)+((w4&0x4)>>2) ;
  	rw4 = ((w1&0x2)<<6)+((w2&0x2)<<5)+((w3&0x2)<<4)+((w4&0x2)<<3)
 		+((w1&0x1)<<3)+((w2&0x1)<<2)+((w3&0x1)<<1)+((w4&0x1)) ;
-	//Ó¦¸Ã×öËÄ´ÎÑ­»·
+	//åº”è¯¥åšå››æ¬¡å¾ªç¯
 	pbuf[516] = rw1 ;
 	pbuf[517] = rw2 ;
 	pbuf[518] = rw3 ;
@@ -665,7 +665,7 @@ void SD_WriteData(unsigned char *ppbuf, int len,int wait)
 	  		temp1= CARD_DATA;
 	}while(temp & 0x00000001);
 
-//¶ÁCRC×´Ì¬
+//è¯»CRCçŠ¶æ€
 	REG_EXMEMCNT &= ~0x0800;
 	command[0]= 0x00;
 	command[1]= 0x00;
@@ -727,11 +727,11 @@ bool SD_initial()
 	
 //	for(counter=0;counter<4000;counter++)
 
-	SD_SendCommand(55,0);   // Ö¸Ê¾ÏÂÒ»¸öÃüÁîÊÇappÃüÁî
+	SD_SendCommand(55,0);   // æŒ‡ç¤ºä¸‹ä¸€ä¸ªå‘½ä»¤æ˜¯appå‘½ä»¤
 	ret = SD_R16Response(pres,0);	
 	if(ret)
 	{
-		SD_SendCommand(41,0x0); //¼ì²âµçÑ¹·¶Î§
+		SD_SendCommand(41,0x0); //æ£€æµ‹ç”µå‹èŒƒå›´
 		ret = SD_R16Response(pres,0);
 		do
 		{
@@ -751,7 +751,7 @@ bool SD_initial()
 	{
 		do
 		{
-			SD_SendCommand(3,0);		//½øÈëstand by ×´Ì¬£¬²¢µÃµ½sd¿¨×´Ì¬
+			SD_SendCommand(3,0);		//è¿›å…¥stand by çŠ¶æ€ï¼Œå¹¶å¾—åˆ°sdå¡çŠ¶æ€
 			ret = SD_R16Response(pres,0);
 		}while((pres[3]&0x1E) != 0x6); //stand by state
 	}
@@ -776,7 +776,7 @@ bool SD_initial()
 	}
 	if(ret)
 	{
-		SD_SendCommand(16,0x200) ;	//Éè¶¨Ò»¸öblockÎª512´óĞ¡
+		SD_SendCommand(16,0x200) ;	//è®¾å®šä¸€ä¸ªblockä¸º512å¤§å°
 		ret = SD_R16Response(pres,0);
 	}
 	return true;
