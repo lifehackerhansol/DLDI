@@ -46,7 +46,7 @@ bool ioEZ5_FlushResponse(void)
 	return true;
 }
 
-void ioEZ5_GetCCITTForWriteBuffer(u8 *ccittResults, u8 *buffer)
+void ioEZ5_GetCCITTForWriteBuffer(u8 *ccittResults, const u8 *buffer)
 {
 	ALIGN(4) u8 crcBuffer[128];
 	u8 w1,w2,w3,w4 ;
@@ -189,12 +189,12 @@ bool ioEZ5_SDReadSector(u32 sector, void *buffer)
 	return true;
 }
 
-bool ioEZ5_SDWriteSector(u32 sector, const void *buffer)
+bool ioEZ5_SDWriteSector(u32 sector, const u8 *buffer)
 {
 	ALIGN(4) u8 ccittResults[8];
 
 	// calculate CRC for write buffer
-	ioEZ5_GetCCITTForWriteBuffer(ccittResults, (u8*)buffer);
+	ioEZ5_GetCCITTForWriteBuffer(ccittResults, buffer);
 
 	// CMD24
 	ioEZ5_SendCommand(IOEZ5_CMD_SDIO_WRITE_SINGLE_BLOCK(sector));
