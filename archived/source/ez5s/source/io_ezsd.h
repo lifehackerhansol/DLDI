@@ -53,7 +53,7 @@ typedef bool BOOL ;
 typedef struct
 {
 	unsigned char 	reseved1 : 6 ; 
-	unsigned char 	CSD_STRUCTURE : 2 ;		//2×Ö½Ú csd ½á¹¹
+	unsigned char 	CSD_STRUCTURE : 2 ;		//2å­—èŠ‚ csd ç»“æ„
 	
 	unsigned char 	TAAC ;					//data read accessed time 1
 	unsigned char 	NSAC ;					//access time 2 in clk cycles 
@@ -103,7 +103,7 @@ typedef struct
 	unsigned char		COPY : 1 ;				//copy flag (OTP)
 	unsigned char 	FILE_FORMAT_GRP : 1 ; 		//File format group 
 	
-	unsigned char 	ALLONE : 1 ;				// not used, always¡¯1¡¯
+	unsigned char 	ALLONE : 1 ;				// not used, alwaysâ€™1â€™
 	unsigned char		CRC : 7 ;					//CRC
 }SD_CSDREAL ;
 
@@ -160,8 +160,8 @@ typedef struct
 	BYTE				byNsac;
 	CSD_TRAN_SPEED		TranSpeed;				
 	WORD				wCCC;
-	BYTE				bRead_Bl_Len;				//×î´óµÄ¶ÁÊı¾İ¿éµÄ´óĞ¡
-	BOOL				bRead_Bl_Partial;			//¾Ö²¿µÄ¿é¶ÁÔÊĞí,×îĞ¡µÄ¿é´óĞ¡ÊÇone byte
+	BYTE				bRead_Bl_Len;				//æœ€å¤§çš„è¯»æ•°æ®å—çš„å¤§å°
+	BOOL				bRead_Bl_Partial;			//å±€éƒ¨çš„å—è¯»å…è®¸,æœ€å°çš„å—å¤§å°æ˜¯one byte
 	BOOL				bWrite_Blk_Misalign;
 	BOOL				bRead_Blk_Misalign;
 	BOOL				bDsr_Imp;
