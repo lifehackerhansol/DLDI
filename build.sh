@@ -11,6 +11,11 @@ mkdir $OUT
 
 set -e
 
+# Build libtwl
+cd libs/libtwl
+make
+cd $TOPDIR
+
 # OSS drivers first
 cd source
 for FILE in *; do
