@@ -1,6 +1,5 @@
 /* EZ5 DLDI driver */
-
-#include "tonccpy.h"
+#include <string.h>
 
 #ifndef NDS
  #if defined ARM9 || defined ARM7
@@ -380,7 +379,7 @@ bool    SD_WriteSingleBlock(unsigned int address , unsigned char *ppbuf, int len
     unsigned char pres[40] ;
 
     u8  pbuf[520] __attribute__ ((aligned (4)));
-    tonccpy(pbuf, ppbuf, 512);
+    memcpy(pbuf, ppbuf, 512);
 	{
 		unsigned char w1,w2,w3,w4 ;
 		unsigned short b1,b2,b3,b4 ;
