@@ -8,8 +8,8 @@
 */
 
 #include <nds/ndstypes.h>
+#include <libtwl/card/card.h>
 #include "ioa3p.h"
-#include "libtwl_card.h"
 
 static inline void ioA3PReadCardData(u64 command, u32 flags, void *buffer, u32 length)
 {
