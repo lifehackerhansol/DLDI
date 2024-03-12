@@ -29,21 +29,20 @@ freely, subject to the following restrictions:
 //#ifdef NDS
 
 //#include <stdio.h>
-//#include <string.h>
+#include <string.h>
+
 #include <nds/ndstypes.h>
 #include "io_sd_card.dldi.h"
 #include "io_x9_card.dldi.h"
 //#include "io_sd_common.h"
 #include "io_x9sd.dldi.h"
 
-#include "tonccpy.h"
-
 /*
 bool SDSendCommand6(uint8* response, uint8 command, uint32 data)
 {
     uint8 sdResponse[32];
     SDBroadcastCommand((SDCommand)command, data, sdResponse);
-    tonccpy(response, sdResponse, 6);
+    memcpy(response, sdResponse, 6);
     return true;
 }
 
@@ -51,7 +50,7 @@ bool SDSendCommand17(uint8* response, uint8 command, uint32 data)
 {
     uint8 sdResponse[32];
     SDBroadcastCommand((SDCommand)command, data, sdResponse);
-    tonccpy(response, sdResponse, 17);
+    memcpy(response, sdResponse, 17);
     return true;
 }
 */

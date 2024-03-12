@@ -25,11 +25,11 @@ freely, subject to the following restrictions:
 
 */
 
+#include <string.h>
+
 #include <nds/ndstypes.h>
 #include "io_x9_card.dldi.h"
 #include "io_x9sd.dldi.h"
-
-#include "tonccpy.h"
 
 //#define DO_DEBUG(statements) do { statements; } while(0)               
 #define DO_DEBUG(statements)
@@ -93,7 +93,7 @@ void X9CardWriteData(uint8 arg1, uint32 arg2, const void* buffer)
 		X9CardPolledWrite(0xC1586000, (uint32*)buffer, x9Command);
 	else
 	{
-	    tonccpy((uint8*)x9Buffer, (const uint8*)buffer, 512);
+	    memcpy((uint8*)x9Buffer, (const uint8*)buffer, 512);
         X9CardPolledWrite(0xC1586000, (uint32*)x9Buffer, x9Command);
 	}
 }
