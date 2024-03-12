@@ -1,8 +1,6 @@
 # DLDI template
 
-This template builds a DLDI driver.
-
-There are two ways to build it:
+There are templates for building a DLDI driver under either the devkitARM or BlocksDS toolchain. You may find them in the `devkitarm` or `blocksds` folder respectively.
 
 ### Using devkitARM
 
