@@ -8,8 +8,8 @@
 */
 
 #include <nds/ndstypes.h>
+#include <libtwl/card/card.h>
 #include "ior4.h"
-#include "libtwl_card.h"
 
 static inline void ioR4ReadCardData(u64 command, u32 flags, void *buffer, u32 length)
 {

@@ -10,7 +10,6 @@
 #pragma once
 
 #include <nds/ndstypes.h>
-#include "ior4.h"
 
 #ifndef NULL
  #define NULL 0

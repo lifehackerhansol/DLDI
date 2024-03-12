@@ -4,9 +4,9 @@
 // SPDX-FileContributor: lifehackerhansol, 2023
 
 #include <nds/ndstypes.h>
-
+#include <libtwl/card/card.h>
 #include "ior4.h"
-#include "libtwl_card.h"
+
 
 // Initialize the driver. Returns true on success.
 bool startup(void)
