@@ -1,0 +1,4 @@
+[submodule "libtwl"]
+	path = libtwl
+	url = https://github.com/lifehackerhansol/libtwl
+	branch = blocksds
