@@ -1,8 +1,8 @@
+#include <string.h>
 #include <nds/ndstypes.h>
 
 #include "io_MartSD.h"
 #include "MartCartop.h"
-#include "tonccpy.h"
 
 static bool  bSDHC =false;
 static u32 SDadd ;
@@ -689,7 +689,7 @@ bool    SD_WriteSingleBlock(unsigned int address , unsigned char *ppbuf, int len
     unsigned char pres[40] ;
 
     u8  pbuf[520] __attribute__ ((aligned (4)));
-    tonccpy(pbuf, ppbuf, 512);
+    memcpy(pbuf, ppbuf, 512);
 	{
 		unsigned char w1,w2,w3,w4 ;
 		unsigned short b1,b2,b3,b4 ;
