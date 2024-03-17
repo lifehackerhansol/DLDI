@@ -30,7 +30,7 @@ static inline void ioRPG_ReadCardData(u64 command, u32 flags, void *buffer, u32 
 
 // SDIO commands send every bit in a byte in order from MSB to LSB
 // This function doesn't handle unaligned reads
-static void ioRPG_SDSendSDIOCommand(u64 command, u8 *buffer, u32 length)
+static void ioRPG_SDSendSDIOCommand(u64 command, u32 *buffer, u32 length)
 {
 	u32 flags;
 	if(length == 0)
@@ -52,30 +52,16 @@ static void ioRPG_SDSendSDIOCommand(u64 command, u8 *buffer, u32 length)
 	}
 
 	u32 i = 0;
-	u32 data[2];
-	u8 * target = buffer + (length >> 3);
 	do
 	{
 		// Read data if available
 		if (card_romIsDataReady())
 		{
-			data[i & 1] = card_romGetData();
-			if (i & 1) {
-				target--;
-				// Since every byte is a bit, read two words,
-				// then pack it into a single byte to represent the 
-				// true value
-				// BIT(7) is the needed bit from the return values
-				for(int j = 0; j < 8; ++j)
-				{
-					u8 bit = (((u8 *)data)[7 - j] & BIT(7)) >> 7;
-					*target |= bit << j;
-				}
-			}
+			*buffer++ = card_romGetData();
 			i++;
 		}
 		// Exit loop when we reach the number of words needed
-		if (i >= (length >> 2)) {
+		if (i >= (length)) {
 			break;
 		}
 	} while (card_romIsBusy());
@@ -95,20 +81,44 @@ static void ioRPG_SDSendSDIOCommand(u64 command, u8 *buffer, u32 length)
 // 8 - 39 in a single u32.
 // QUIRK: RPG doesn't send the MSB. We must assume the MSB is 0, and shift the response >> 1.
 static u32 ioRPG_SDSendR1Command(u8 cmd, u32 argument) {
-	ALIGN(4) u64 buffer = 0;
-	ioRPG_SDSendSDIOCommand(IORPG_CMD_SDIO(cmd, IORPG_SDIO_READ_RESPONSE, argument), (u8 *)&buffer, 48);
+	u32 buffer = 0;
+	u8 *u8_buffer = (u8*)&buffer;
+	ALIGN(4) u8 response[48];
+	ioRPG_SDSendSDIOCommand(IORPG_CMD_SDIO(cmd, IORPG_SDIO_READ_RESPONSE, argument),  (u32 *)response, 48 >> 2);
 
-	return (u32)(buffer >> 9);
+	u32 bit_count = 38; // Get bits 8-39, and consider the quirk
+	for(u32 i = 0; i < 4; ++i) {
+		// Since every byte is a bit, pack it into a single byte
+		// to represent the true value
+		// BIT(7) is the needed bit from the return values
+		for(u32 j = 0; j < 8; ++j)
+		{
+			u8 bit = (response[bit_count--] & BIT(7)) >> 7;
+			u8_buffer[i] |= bit << j;
+		}
+	}
+
+	return buffer;
 }
 
 // This function gets the full R2 response, and truncates it to bits
 // 8 - 135. (CID/CSD with no CRC7.)
 // QUIRK: RPG doesn't send the MSB. We must assume the MSB is 0, and shift the response >> 1.
-// TODO: actually verify this buffer. We don't actually need it in DLDI, just need to send command
-// and clear the FIFO.
-static void ioRPG_SDSendR2Command(u8 cmd, u32 argument) {
-	ALIGN(4) u8 ret[136 >> 3] = {};
-	ioRPG_SDSendSDIOCommand(IORPG_CMD_SDIO(cmd, IORPG_SDIO_READ_RESPONSE, argument), ret, 136);
+static void ioRPG_SDSendR2Command(u8 cmd, u32 argument, u8 * buffer) {
+	ALIGN(4) u8 response[136];
+	ioRPG_SDSendSDIOCommand(IORPG_CMD_SDIO(cmd, IORPG_SDIO_READ_RESPONSE, argument), (u32 *)response, 136 >> 2);
+
+	u32 bit_count = 134; // Get bits 8-135, and consider the quirk
+	for(u32 i = 0; i < 16; ++i) {
+		// Since every byte is a bit, pack it into a single byte
+		// to represent the true value
+		// BIT(7) is the needed bit from the return values
+		for(u32 j = 0; j < 8; ++j)
+		{
+			u8 bit = (response[bit_count--] & BIT(7)) >> 7;
+			buffer[i] |= bit << j;
+		}
+	}
 }
 
 static bool ioRPG_WaitBusy(void)
@@ -188,6 +198,7 @@ bool ioRPG_Initialize(void)
 {
 	int isSD20 = 0;
 	u32 responseR1 = 0;
+	u32 responseR2[4] = {};
 
 	// CMD0
 	ioRPG_SDSendSDIOCommand(IORPG_CMD_SDIO(0, IORPG_SDIO_NORESPONSE, 0), NULL, 0);
@@ -215,14 +226,14 @@ bool ioRPG_Initialize(void)
 	}
 
 	// CMD2
-	ioRPG_SDSendR2Command(2, 0);
+	ioRPG_SDSendR2Command(2, 0, (u8 *)responseR2);
 
 	// CMD3
 	responseR1 = ioRPG_SDSendR1Command(3, 0);
 	u32 sdio_rca = responseR1 >> 16;
 
 	// CMD9
-	ioRPG_SDSendR2Command(9, (sdio_rca << 16));
+	ioRPG_SDSendR2Command(9, (sdio_rca << 16), (u8 *)responseR2);
 
 	// CMD7
 	ioRPG_SDSendR1Command(7, (sdio_rca << 16));
