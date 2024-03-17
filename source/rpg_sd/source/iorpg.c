@@ -15,6 +15,7 @@
 #include "iorpg.h"
 
 static u32 isSDHC = 0;
+static u32 SDSectorCount = 0;
 
 extern void ioRPG_Delay(u32 count);
 
@@ -193,6 +194,8 @@ u32 ioRPG_SendCommand(u64 command)
 	return card_romGetData();
 }
 
+extern u32 calculateSDSectorCount(u32 * csd);
+
 // SDIO initialization
 bool ioRPG_Initialize(void)
 {
@@ -234,6 +237,7 @@ bool ioRPG_Initialize(void)
 
 	// CMD9
 	ioRPG_SDSendR2Command(9, (sdio_rca << 16), (u8 *)responseR2);
+	SDSectorCount = calculateSDSectorCount(responseR2);
 
 	// CMD7
 	ioRPG_SDSendR1Command(7, (sdio_rca << 16));
@@ -274,16 +278,31 @@ void ioRPG_SDReadMultiSector(u32 sector, u32 num_sectors, void* buffer)
 	ioRPG_SDSendSDIOCommand(IORPG_CMD_SDIO(18, IORPG_SDIO_READ_MULTI_BLOCK, address), NULL, 0);
 	ioRPG_WaitBusy();
 
-	do
+	while(num_sectors)
 	{
 		ioRPG_ReadCardData(IORPG_CMD_CARD_READ_DATA, (IORPG_CTRL_READ_512B | MCCNT1_LATENCY1(4)), buffer, 128);
 		ioRPG_SDWaitForState(0x7);
 		buffer = (u8 *)buffer + 0x200;
 		num_sectors--;
-	} while(num_sectors);
+
+		// If we reached the last sector, we need to switch to single-sector reads to finish off
+		if((++sector) == SDSectorCount) break;
+	};
 
 	// CMD12
 	ioRPG_SDSendR1Command(12, 0);
+
+	// Finish off remaining sectors that may be left
+	if(num_sectors)
+	{
+		while(num_sectors)
+		{
+			ioRPG_SDReadSingleSector(sector, buffer);
+			sector++;
+			buffer = (u8 *)buffer + 0x200;
+			num_sectors--;
+		}
+	}
 }
 
 void ioRPG_SDWriteSingleSector(u32 sector, const void* buffer)
