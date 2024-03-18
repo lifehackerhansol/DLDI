@@ -101,19 +101,6 @@ static bool mk6_tf_cmd_resp6( u8 *resp )   {
    return mk6_tf_cmd_resp( resp, 48/8 );
 }
 
-static void db_resp( u8 cmd, u8 *resp )   {
-   iprintf( "CMD%u: %02X %02X %02X %02X %02X %02X\n", cmd, resp[0], resp[1], resp[2], resp[3], resp[4], resp[5] );
-}
-
-static void db_resp6( u8 cmd, u8 *resp )   {
-   iprintf( "CMD%u: %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X\n", cmd, resp[0], resp[1], resp[2], resp[3], resp[4], resp[5], resp[6], resp[7], resp[8], resp[9], resp[10], resp[11], resp[12], resp[13], resp[14], resp[15], resp[16] );
-}
-
-static void db_aresp( u8 cmd, u8 *resp )   {
-   iprintf( "ACMD%u: %02X %02X %02X %02X %02X %02X\n", cmd, resp[0], resp[1], resp[2], resp[3], resp[4], resp[5] );
-}
-
-
 ///////////////////////////////////////////////////////////////////////////////
 
 bool mk6_tf_go_idle_state_cmd()
@@ -126,16 +113,11 @@ bool mk6_tf_send_app_cmd( u16 rca )
 {
    u8 resp[48/8] = { 0, 0, 0, 0, 0, 0 };
 
-   //iprintf( "send app cmd...\n" );
-
    mk6_tf_cmd( 55, ((rca << 16) | 0xFFFF) );
    if( mk6_tf_cmd_resp1( resp ) && (resp[0] == 55) )
    {
-      db_resp( 55, resp );
       return true;
    }
-   db_resp( 55, resp );
-   iprintf( "error\n" );
    return false;
 }
 
@@ -145,9 +127,6 @@ bool mk6_tf_send_op_cond_cmd( u32 ocr, u32 *ocr_out )
 
    if( mk6_tf_send_app_cmd(0) )
    {
-
-      //iprintf( "send op cond...\n" );
-
       mk6_tf_cmd( 41, ocr );
       if( mk6_tf_cmd_resp3( resp ) && (resp[0] == 0x3f) && (resp[1] & 0x80) )
       {
@@ -155,12 +134,9 @@ bool mk6_tf_send_op_cond_cmd( u32 ocr, u32 *ocr_out )
          {
             *ocr_out = ((resp[1] << 24) | (resp[2] << 16) | (resp[3] << 8) | resp[4]);
          }
-         db_aresp( 41, resp );
          return true;
       }
-      db_aresp( 41, resp );
    }
-   iprintf( "error\n" );
    return false;
 }
 
@@ -170,12 +146,9 @@ bool mk6_tf_all_send_cid()   {
    {
       if( mk6_tf_cmd_resp2( resp ) && (resp[0] == 0x3f) )
       {
-         db_resp6( 2, resp );
          return true;
       }
-      db_resp6( 2, resp );
    }
-   iprintf( "error\n" );
    return false;
 }
 
@@ -187,12 +160,9 @@ bool mk6_tf_send_relative_addr_cmd( u16 *rca )
       if( mk6_tf_cmd_resp6( resp ) && (resp[0] == 3) )
       {
          *rca = (resp[1]<<8) | resp[2];
-         db_resp( 3, resp );
          return true;
       }
-      db_resp( 3, resp );
    }
-   iprintf( "error\n" );
    return false;
 }
 
@@ -201,12 +171,9 @@ bool mk6_tf_select_cmd( u16 rca )   {
    mk6_tf_cmd( 7, (((rca>>8)&0xFF)<<24) | ((rca&0xFF)<<16) | 0xFFFF );
    {
       if( mk6_tf_cmd_resp1( resp ) && (resp[0] == 7) )   {
-         db_resp( 7, resp );
          return true;
       }
-      db_resp( 7, resp );
    }
-   iprintf( "error\n" );
    return false;
 }
 
@@ -219,12 +186,9 @@ bool mk6_tf_set_bus_width_cmd( u16 rca, u8 width )   {
       mk6_tf_cmd( 6, width );
       if( mk6_tf_cmd_resp1( resp ) && (resp[0] == 6) )
       {
-         db_resp( 6, resp );
          return true;
       }
-      db_resp( 6, resp );
    }
-   iprintf( "error\n" );
    return false;
 }
 
@@ -255,7 +219,6 @@ bool mk6_tf_init()
       return false;
    }
 
-   //iprintf( "Success.\n" );
    if( mk6_tf_all_send_cid() )
    {
       if( mk6_tf_send_relative_addr_cmd( &rca ) )
@@ -264,7 +227,6 @@ bool mk6_tf_init()
          {
             if( mk6_tf_set_bus_width_cmd( rca, 4 ) )
             {
-               iprintf( "tf init great success!\n" );
                return true;
             }
          }
@@ -279,7 +241,6 @@ bool mk6_tf_read_sector_a( u8 *buf, u32 addr )
    u8 resp[6];
    mk6_tf_cmd( 17, addr );
    if( mk6_tf_cmd_resp1( resp ) && (resp[0] == 17) )   {
-      db_resp( 17, resp );
       while( mk6_tf_data_read_4bits() != 0 )   {
          ;
       }
@@ -302,13 +263,9 @@ bool mk6_tf_read_sector_a( u8 *buf, u32 addr )
 
       // Clock out end bit
       mk6_tf_data_read_4bits();
-      //db_resp( 6, resp );
-      iprintf( "tf read great success!\n" );
       return true;
 
    }
-   db_resp( 17, resp );
-   iprintf( "error\n" );
    return false;
 }
 
@@ -318,7 +275,6 @@ bool mk6_tf_read_sector_b( u8 *buf, u32 addr )
    u8 resp[6];
    mk6_tf_cmd( 17, addr );
    if( mk6_tf_cmd_resp1( resp ) && (resp[0] == 17) )   {
-      db_resp( 17, resp );
       while( mk6_tf_data_read_4bits() != 0 )   {
          ;
       }
@@ -341,13 +297,9 @@ bool mk6_tf_read_sector_b( u8 *buf, u32 addr )
 
       // Clock out end bit
       mk6_tf_data_read_4bits();
-      //db_resp( 6, resp );
-      iprintf( "tf read great success!\n" );
       return true;
 
    }
-   db_resp( 17, resp );
-   iprintf( "error\n" );
    return false;
 }
 
@@ -362,17 +314,9 @@ bool mk6_tf_write_sector( u8 *buf, u32 addr )
    *(u32*)&crcbuf[0]=0;
    *(u32*)&crcbuf[4]=0;
    sdCrc16(crcbuf, buf, 512); // Calculate crcs
-   
-   drawMessage( "write %x", addr );
-   
-   //return true;
-   
+  
    mk6_tf_cmd( 24, addr );
    if( mk6_tf_cmd_resp1( resp ) && (resp[0] == 24) )   {
-      //drawFwFatal( "Write Sector Success\n" );
-      //db_resp( 24, resp );
-      
-      drawMessage( "write %x cmd ok", addr );
       
    for (i = 0; i < 128; i++)   // this can probably be reduced to zero
    mk6_tf_data_write_byte( 0xff );   // write 40 P bits... should be more than enough
@@ -399,11 +343,7 @@ bool mk6_tf_write_sector( u8 *buf, u32 addr )
    return true;
    
    }
-   //drawFwFatal( "Write Sector Failed\n" );
    //while(1);
-   //db_resp( 24, resp );
-   //iprintf( "error\n" );
-   drawMessage( "write %x cmd error", addr );
    return false;
 }
 

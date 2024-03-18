@@ -240,31 +240,12 @@ void mk6_nor_program_word( u32 addr, u32 data )
    }
 }
 
-static void db( const char *s )
-{
-      //swiWaitForVBlank();
-      //clearFrameBuf();
-      //drawFwTitle();
-      //drawFwToolbar();
-      //drawMessage( "%s", s );
-      //flushFrameBuf();
-      return;
-      while( 1 )   {
-         scanKeys();
-         if( keysDown() & 1 )            {
-            break;
-         }
-      }
-}
-
 void mk6_nor_program( u32 addr, u16 *buf, u32 size )
 {
    u32 i;
 //   u32 update;
 
 //   char msg[1024];
-
-//   db("erasing...");
 
    mk6_nor_locking_op( addr, MK6_LOCKING_OP_UNLOCK );
    mk6_nor_erase( addr );
@@ -279,14 +260,10 @@ void mk6_nor_program( u32 addr, u16 *buf, u32 size )
          mk6_nor_read_array( addr + i );
          if( mk6_nor_read_half( addr + i ) != 0xffff )
          {
-            //sprintf( msg, "erase error at %x / %x", addr + i, size );
-            //db(msg);
             while(1);
          }
       }
    }
-
-//   db("flashing...");
 
    for(i=0;i<size;i+=2)
    {
@@ -295,8 +272,6 @@ void mk6_nor_program( u32 addr, u16 *buf, u32 size )
       mk6_nor_read_array( addr + i );
       if( mk6_nor_read_half( addr + i ) != buf[ i/2 ] )
       {
-      //   sprintf( msg, "flash error at %x / %x", addr + i, size );
-   //      db(msg);
          while(1);
       }
 
@@ -345,8 +320,6 @@ u16 mk6_sram_read_half( u32 addr )
 
 void mk6_tf_cmd_write_byte( u8 data )
 {
-   //iprintf("send cmd byte %x\n", data);         // print here to be sure
-
    // this code works, can test exactly using button A
 
    //u8 buf[4];

@@ -39,8 +39,6 @@ void mk6_nor_erase( u32 addr );
 
 void mk6_nor_program_word( u32 addr, u32 data );
 
-//static void db( const char *s );
-
 void mk6_nor_program( u32 addr, u16 *buf, u32 size );
 
 ////////////////////////////////////////////////////////////////////////////////
