@@ -58,7 +58,7 @@ static inline u64 IOEZ5_CMD_WAIT_BUSY()
 
 static inline u64 IOEZ5_CMD_WAIT_WRITE_BUSY()
 {
-    return IOEZ5_CMD_SDMC | 0x8ull << 48;
+    return IOEZ5_CMD_SDMC | (0x8ull << 48);
 }
 
 static inline u64 IOEZ5_CMD_SDIO_READ_SINGLE_BLOCK(u32 sector)
