@@ -39,11 +39,13 @@ static inline u64 IOEZ5_CMD_SDIO(u8 cmd, u32 parameter)
     return command;
 }
 
-// TODO: what are each of the response types?
-static inline u64 IOEZ5_CMD_READ_RESPONSE(u8 responseType)
+// Read back the SDIO response.
+// 48-bit SDIO responses are 6 bytes, 136-bit SDIO responses are 17 bytes.
+// responseByte is to specify which byte to retrieve.
+static inline u64 IOEZ5_CMD_READ_RESPONSE(u8 responseByte)
 {
     u64 command = IOEZ5_CMD_SDMC | (0xAull << 48);
-    command |= (u64)responseType << 40;
+    command |= (u64)responseByte << 40;
     return command;
 }
 
