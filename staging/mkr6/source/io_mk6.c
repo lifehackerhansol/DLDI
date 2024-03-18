@@ -101,6 +101,41 @@ static bool mk6_tf_cmd_resp6( u8 *resp )   {
    return mk6_tf_cmd_resp( resp, 48/8 );
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
+void sdCrc16(u8 *p_crc, u8 *data, int len) {
+   int i;
+   u8 nybble;
+
+   u64 poly = 0x0001000000100001LL;
+   u64 crc = 0;
+   u64 n_crc; // This can probably be u32
+
+   // Load crc from array
+   for (i = 0; i < 8; i++) {
+      crc <<= 8;
+      crc |= p_crc[i];
+   }
+
+   for (i = 0; i < (len * 2); i++) {
+      if (i & 1) nybble = (data[i >> 1] & 0x0F);
+      else nybble = (data[i >> 1] >> 4);
+
+      n_crc = (crc >> (15 * 4));
+      crc <<= 4;
+      if ((nybble ^ n_crc) & 1) crc ^= (poly << 0);
+      if ((nybble ^ n_crc) & 2) crc ^= (poly << 1);
+      if ((nybble ^ n_crc) & 4) crc ^= (poly << 2);
+      if ((nybble ^ n_crc) & 8) crc ^= (poly << 3);
+   }
+
+   // Output crc to array
+   for (i = 7; i >= 0; i--) {
+      p_crc[i] = crc;
+      crc >>= 8;
+   }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 bool mk6_tf_go_idle_state_cmd()
