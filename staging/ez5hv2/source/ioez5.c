@@ -151,13 +151,11 @@ bool ioEZ5_SDWriteSector(u32 sector, const u8 *buffer)
     for (u32 i=0; i < 512; i += 2) {
         card_romSetCmd(IOEZ5_CMD_SDMC_WRITE_DATA(buffer + i));
         card_romStartXfer(IOEZ5_CTRL_READ_0, false);
-        while(card_romIsBusy());
     }
 	// send CRC data
     for (u32 i=0; i < 8; i += 2) {
         card_romSetCmd(IOEZ5_CMD_SDMC_WRITE_DATA(buffer_crc + i));
         card_romStartXfer(IOEZ5_CTRL_READ_0, false);
-        while(card_romIsBusy());
     }
 
 	// Read write status
