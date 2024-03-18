@@ -343,18 +343,6 @@ u16 mk6_sram_read_half( u32 addr )
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifdef MK6_ASM
-
-void mk6_tf_cmd_write_byte( u8 data );
-u8 mk6_tf_cmd_read_bits( u8 bits );
-//u8 mk6_tf_data_read_bits( u8 bits );
-u8 mk6_tf_data_read_4bits();
-void mk6_tf_data_read_512bytes( u8 *buf );
-//u8 mk6_tf_data_read_byte();
-//void mk6_tf_data_read( u8 *buf, u32 len );
-
-#else // MK6_ASM
-
 void mk6_tf_cmd_write_byte( u8 data )
 {
    //iprintf("send cmd byte %x\n", data);         // print here to be sure
@@ -458,8 +446,6 @@ void mk6_tf_data_read_512bytes( u8 *buf )
       buf = mk6_tf_data_read_byte();
    }
 }*/
-
-#endif // MK6_ASM
 
 u8 mk6_tf_cmd_read_byte()
 {

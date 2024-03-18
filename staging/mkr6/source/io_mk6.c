@@ -14,15 +14,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifdef MK6_ASM
-
-void mk6_tf_cmd( u8 cmd, u32 arg );
-bool mk6_tf_cmd_resp( u8 *resp, u32 len );
-bool mk6_tf_cmd_resp1( u8 *resp );
-bool mk6_tf_read_sector_b( u8 *buf, u32 addr );
-
-#else // MK6_ASM
-
 static const unsigned char crcTab[256]={
    0x00, 0x09, 0x12, 0x1B, 0x24, 0x2D, 0x36, 0x3F, 0x48, 0x41, 0x5A, 0x53, 0x6C, 0x65, 0x7E, 0x77,
    0x19, 0x10, 0x0B, 0x02, 0x3D, 0x34, 0x2F, 0x26, 0x51, 0x58, 0x43, 0x4A, 0x75, 0x7C, 0x67, 0x6E,
@@ -97,8 +88,6 @@ static bool mk6_tf_cmd_resp( u8 *resp, u32 len )
 static bool mk6_tf_cmd_resp1( u8 *resp )   {
    return mk6_tf_cmd_resp( resp, 48/8 );
 }
-
-#endif // MK6_ASM
 
 static bool mk6_tf_cmd_resp2( u8 *resp )   {
    return mk6_tf_cmd_resp( resp, 136/8 );
@@ -323,8 +312,6 @@ bool mk6_tf_read_sector_a( u8 *buf, u32 addr )
    return false;
 }
 
-#ifndef MK6_ASM
-
 bool mk6_tf_read_sector_b( u8 *buf, u32 addr )
 {
    int i,j;
@@ -363,8 +350,6 @@ bool mk6_tf_read_sector_b( u8 *buf, u32 addr )
    iprintf( "error\n" );
    return false;
 }
-
-#endif // MK6_ASM
 
 bool mk6_tf_write_sector( u8 *buf, u32 addr )
 {

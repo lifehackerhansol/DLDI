@@ -12,9 +12,6 @@
 
 #include <nds.h>
 
-#define MK6_ASM
-
-
 void mk6_tf_data_read_512bytes( u8 *buf );
 
 void mk6_spi_command( const u8 *cmd, u32 len );
