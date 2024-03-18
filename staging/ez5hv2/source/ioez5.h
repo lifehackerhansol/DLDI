@@ -12,6 +12,8 @@
 #pragma once
 
 #include <nds/ndstypes.h>
+
+#include "libtwl_card.h"
 #include "ioez5.h"
 
 #ifndef NULL

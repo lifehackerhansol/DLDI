@@ -6,7 +6,6 @@
 #include <nds/ndstypes.h>
 
 #include "ioez5.h"
-#include "card.h"
 
 // Initialize the driver. Returns true on success.
 bool startup(void)
