@@ -40,7 +40,7 @@ static u8 crc7 (const unsigned char *buf,unsigned int len)
   u8 crc7_accum = 0;
   register u8 crc=0;
   for (i = 0;  i < len;  ++i)   {
-      crc7_accum = crcTab[(crc7_accum << 1) ^ buf];
+      crc7_accum = crcTab[(crc7_accum << 1) ^ *buf++];
   }
   crc ^= crc7_accum;
   return crc;
