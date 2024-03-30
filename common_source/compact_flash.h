@@ -39,28 +39,31 @@
 #define IO_CF_COMMON_H
 
 #ifndef NDS
- #if defined ARM9 || defined ARM7
-  #define NDS
- #endif
+	#if defined ARM9 || defined ARM7
+		#define NDS
+	#endif
 #endif
 
 #ifdef NDS
- #include <nds/ndstypes.h>
+	#include <nds/ndstypes.h>
 #else
- #include "gba_types.h"
+	#include "gba_types.h"
 #endif
 
 #define BYTES_PER_READ 512
 
 #ifndef NULL
- #define NULL 0
+	#define NULL 0
 #endif
+
+// libnds/libgba defines
+#define REG_EXMEMCNT (*(vu16*)0x04000204)
 
 typedef struct {
 	vu16* data;
 	vu16* status;
 	vu16* command;
-	vu16* error;
+	vu16* features;
 	vu16* sectorCount;
 	vu16* lba1;
 	vu16* lba2;
@@ -77,17 +80,21 @@ typedef struct {
 #define CF_STS_DRQ			0x08
 #define CF_STS_BUSY			0x80
 
+// ??
+#define CF_STS_40			0x40
+
 // CF Card commands
 #define CF_CMD_LBA			0xE0
 #define CF_CMD_READ			0x20
 #define CF_CMD_WRITE		0x30
 
-#define CF_CARD_TIMEOUT	10000000
+#define CARD_TIMEOUT	0x00989680				// Updated due to suggestion from SaTa, otherwise card will timeout sometimes on a write
+#define CARD_INITTIMEOUT	0x020000			// Shorter time out used during startup.
 
 bool _CF_isInserted (void);
 bool _CF_clearStatus (void);
 bool _CF_readSectors (u32 sector, u32 numSectors, void* buffer);
-bool _CF_writeSectors (u32 sector, u32 numSectors, void* buffer);
+bool _CF_writeSectors (u32 sector, u32 numSectors, const void* buffer);
 bool _CF_shutdown(void);
 bool _CF_startup(const CF_REGISTERS *usableCfRegs);
 
