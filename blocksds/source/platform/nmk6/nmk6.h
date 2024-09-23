@@ -1,0 +1,29 @@
+#include "libtwl_card.h"
+
+#define NMK6_CTRL_BASE      (MCCNT1_ENABLE | MCCNT1_RESET_OFF | MCCNT1_CMD_SCRAMBLE | MCCNT1_CLOCK_SCRAMBLER | MCCNT1_READ_DATA_DESCRAMBLE)
+#define NMK6_CTRL_READ_4B   (NMK6_CTRL_BASE | MCCNT1_LEN_4 | MCCNT1_LATENCY2(0) | MCCNT1_LATENCY1(0))
+
+#define NMK6_INIT_SEQUENCE 0x69696969
+
+// D7 57 XX 00 00 00 00 00
+// xx = a byte to transfer
+static inline u64 NMK6_CMD_WRITE(u8 data)
+{
+    return (0xD757000000000000ull | ((u64)data << 40));
+}
+
+// D7 6X 00 00 00 00 00 00
+// x = 5 + y, y = num bits to read
+// It can read up to 4 bits at a time
+static inline u64 NMK6_CMD_READ(u32 num_bits)
+{
+    return (0xD765000000000000ull + (((u64)num_bits) << 48));
+}
+
+#define NMK6_CMD_DATA_READ  0xD746000000000000ull
+
+#define NMK6_CMD_DATA_READ_1024  0xD74E000000000000ull
+
+// D7 38 0X 00 00 00 00 00
+// x = halfbyte to transfer
+#define NMK6_CMD_DATA_WRITE  0xD738000000000000ull
