@@ -18,9 +18,9 @@ include $(DEVKITARM)/ds_rules
 #---------------------------------------------------------------------------------
 export TARGET		:=	$(shell basename $(CURDIR))
 BUILD		:=	build
-SOURCES		:=	source
+SOURCES		:=	source ../../common_source
 DATA		:=	data
-INCLUDES	:=	include
+INCLUDES	:=	include ../../common_source
 
 
 #---------------------------------------------------------------------------------
@@ -31,7 +31,7 @@ ARCH	:=	-march=armv4t -mtune=arm7tdmi -fPIC
 CFLAGS	:=	-g -Wall -Os -ffunction-sections -fdata-sections\
 			$(ARCH)
 
-CFLAGS	+=	$(INCLUDE) -DARM7 -ffreestanding -D_IO_ALLOW_UNALIGNED -D_IO_USEFASTCNT
+CFLAGS	+=	$(INCLUDE) -DARM7 -ffreestanding -D_IO_ALLOW_UNALIGNED
 
 CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions
 
