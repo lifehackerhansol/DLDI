@@ -37,13 +37,13 @@
 @ IO_INTERFACE data -- 32 bytes
 	.ascii	"MMCF"				@ ioType
 	.word	FEATURE_MEDIUM_CANREAD | FEATURE_MEDIUM_CANWRITE | FEATURE_SLOT_GBA
-	.word	MMCF_StartUp		@ 
-	.word	MMCF_IsInserted		@ 
-	.word	MMCF_ReadSectors	@   Function pointers to standard device driver functions
-	.word	MMCF_WriteSectors	@ 
-	.word	MMCF_ClearStatus	@ 
-	.word	MMCF_Shutdown		@ 
-	
+	.word	startup			@ 
+	.word	isInserted		@ 
+	.word	readSectors		@   Function pointers to standard device driver functions
+	.word	writeSectors	@ 
+	.word	clearStatus		@ 
+	.word	shutdown		@ 
+
 @---------------------------------------------------------------------------------
 _start:
 @---------------------------------------------------------------------------------
