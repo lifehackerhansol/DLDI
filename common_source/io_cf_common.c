@@ -64,7 +64,7 @@ bool return OUT:  true if a CF card is inserted
 bool _CF_isInserted (void) {
 	// Change register, then check if value did change
 	*(cfRegisters.status) = CF_STS_INSERTED;
-	return ((*(cfRegisters.status) & 0xff) == CF_STS_INSERTED);
+	return (*(cfRegisters.status) & CF_STS_INSERTED);
 }
 
 
