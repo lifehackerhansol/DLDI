@@ -52,6 +52,22 @@ static u8 X9SD_CardRead1Byte(void) {
     return ((u8*)&data)[X9SD_CardReadIndex++];
 }
 
+// Waits for a non-0xF0 response from the card.
+// This is only used in the sector read function.
+// If the transfer length is finished without a non-0xF0 response, return false.
+static bool X9SD_CardWaitDataReady(u64 command, u32 flags) {
+    // Reset the card read state machine.
+    X9SD_CardReadIndex = 4;
+
+    // Start transfer.
+    card_romSetCmd(command);
+    card_romStartXfer(flags, false);
+    do {
+        if ((X9SD_CardRead1Byte() & 0xF0) == 0) return true;
+    } while (card_romIsBusy());
+    return false;
+}
+
 // Initializes the card to a usable state for SD access.
 void X9SD_Initialize(void) {
     X9SD_CardSendCommand58(0);
@@ -64,55 +80,52 @@ void X9SD_Initialize(void) {
 
 // Reads a block from the SD card.
 void X9SD_SDReadSector(u32 sector, u8* buffer) {
-    // Allocate a scratch buffer of 2KiB.
-    // Make sure it's aligned, and let's try not to use too much stack...
-    static ALIGN(4) u8 scratch[0x800];
-
     // CMD17 - Read single block
-    // This might start the transfer immediately, so save everything to the scratch buffer.
-    // Data is in half bytes. After a stream of 0xF0 bytes, and a single non-0xF0 byte, we have our
-    // real data. Start looking
-    cardExt_ReadData(X9SD_CMD_SDIO(17, sector), X9SD_CTRL_READ_512B, scratch, 128);
+    // This might start the transfer immediately, so we do things a little differently. Data is in
+    // half bytes. After a stream of 0xF0 bytes, and a single non-0xF0 byte, we have our real data.
+    // Start looking
+    bool data_ready = X9SD_CardWaitDataReady(X9SD_CMD_SDIO(17, sector), X9SD_CTRL_READ_512B);
 
-    // The data start marker is a 0xF000 pattern (checking upper halfbyte only.)
-    // Everything before this pattern is a stream of 0xF0 bytes.
-    // Did we get it right away?
-    bool data_ready = false;
-    int i = 0;
-    // This will break when we see a non-0xF0 byte. If we get this, we have our data.
-    for (i = 0; i < 512; i++) {
-        if (!(scratch[i] & 0xF0)) {
-            // We found our data. Let's move on
-            data_ready = true;
-            break;
+    // If we didn't get any data yet, keep reading
+    // We assume that if we didn't get any data, the previous 512 byte transfer completed
+    while (!data_ready)
+        data_ready = X9SD_CardWaitDataReady(X9SD_CMD_CARD_DATA_READ(sector), X9SD_CTRL_READ_512B);
+
+    // Start tracking number of halfbytes
+    u32 dataIdx = 0;
+
+    // Scratch buffer for packing halfbytes to full bytes
+    u8 scratch = 0;
+
+    // Start reading our sector.
+    // 0x200 byte sector == 0x400 halfbytes
+    while (dataIdx < 0x400) {
+        // Start a new transfer if the previous transfer has ended.
+        if (!card_romIsBusy()) {
+            card_romSetCmd(X9SD_CMD_CARD_DATA_READ(sector));
+            card_romStartXfer(X9SD_CTRL_READ_1KB, false);
+        }
+
+        // Write to buffer.
+        scratch |= ((X9SD_CardRead1Byte() & 0xF0) >> (dataIdx & 1 ? 4 : 0));
+        if (dataIdx++ & 1) {
+            *buffer++ = scratch;
+            // reset scratch.
+            scratch = 0;
         }
     }
 
-    // If we looped through all 512 bytes... we didn't get it.
-    // Let's keep polling until we find it
-    while (!data_ready) {
-        cardExt_ReadData(X9SD_CMD_CARD_DATA_READ(sector), X9SD_CTRL_READ_512B, scratch, 128);
-        for (i = 0; i < 512; i++) {
-            if (!(scratch[i] & 0xF0)) {
-                // We found our data. Let's move on
-                data_ready = true;
-                break;
-            }
+    // Reset the card read state machine.
+    X9SD_CardReadIndex = 4;
+
+    // At this point, the console might still be trying to poll data, as we didn't get our data in
+    // 512 byte aligned blocks. If so, we need to flush the transfer.
+    while (card_romIsBusy()) {
+        // Read data if available
+        if (card_romIsDataReady()) {
+            register u32 data = card_romGetData();
         }
     }
-
-    // The previous for loop should have stopped at an 0x00 byte.
-    // We need to go one more byte from here, which is where our data stream starts.
-    i++;
-
-    // We probably didn't read our entire block yet. Let's pull the whole thing down in one go
-    // Read above the last 512 byte that we received
-    cardExt_ReadData(X9SD_CMD_CARD_DATA_READ(sector), X9SD_CTRL_READ_1KB, scratch + 0x200, 256);
-
-    // Pack our data into bytes, and write it to the buffer.
-    for (int j = 0; j < 0x400; j += 2)
-        *buffer++ = (scratch[i + j] & 0xF0) | ((scratch[i + j + 1] & 0xF0) >> 4);
-
     // Seems we also need to do one last dummy poll...
     cardExt_ReadData(X9SD_CMD_CARD_DATA_READ(sector), X9SD_CTRL_READ_512B, NULL, 0);
 }
