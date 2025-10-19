@@ -55,6 +55,15 @@
 
 static CF_REGISTERS cfRegisters = {0};
 
+#ifdef _IO_USEFASTCNT
+static inline u16 _CF_setFastCNT(u16 originData) {
+	//  2-3   32-pin GBA Slot ROM 1st Access Time (0-3 = 10, 8, 6, 18 cycles)
+	//    4     32-pin GBA Slot ROM 2nd Access Time (0-1 = 6, 4 cycles)
+	const u16 mask = ~(7<<2);//~ 000011100, clear bit 2-3 + 4
+	const u16 setVal = ((2) << 2) | (1<<4);
+	return (originData & mask) | setVal;
+}
+#endif
 
 /*-----------------------------------------------------------------
 _CF_isInserted
@@ -190,6 +199,12 @@ void* buffer OUT: pointer to 512 byte buffer to store data in
 bool return OUT: true if successful
 -----------------------------------------------------------------*/
 bool _CF_readSectors (u32 sector, u32 numSectors, void* buffer) {
+
+#if defined(_IO_USEFASTCNT) && defined(ARM9)
+	u16 originMemStat = REG_EXMEMCNT;
+	REG_EXMEMCNT = setFastCNT(originMemStat);
+#endif
+
 	while(numSectors > 0)
 	{
 		u32 sector_count;
