@@ -22,7 +22,7 @@
 uint32 status=0,flags = 0x00586000;
 extern void SD_cal_crc16(unsigned char*p1,unsigned int s,unsigned char*p2);
 
-u32 SDadd; //´ËÈ«¾Ö±äÁ¿Îª¹µÍ¨µÄSDµØÖ·
+u32 SDadd; //æ­¤å…¨å±€å˜é‡ä¸ºæ²Ÿé€šçš„SDåœ°å€
 // some variables statically allocated by the build rather than built onto stack space, for unaligned writes - cory1492
 __attribute__((aligned(32))) static u8 pbuf[528];
 __attribute__((aligned(32))) static u8 crcbuf[16];
@@ -97,7 +97,7 @@ bool SD_ReadSingleBlock(unsigned int address , unsigned char *ppbuf, int len)
 	p = (unsigned char *)(&temp);	
 
 	SD_SendCommand(17,address); // single block  read , parm = address
-	//µÈ´ıÆğÊ¼±êÖ¾Î»ÖÃ
+	//ç­‰å¾…èµ·å§‹æ ‡å¿—ä½ç½®
 	command[0]= 0x00;
 	command[1]= 0x00;
 	command[2]= 0x00;
@@ -124,7 +124,7 @@ bool SD_ReadSingleBlock(unsigned int address , unsigned char *ppbuf, int len)
 		}
 	}while(temp & 0x000000FF);
 
-	//¶Á512 ByteÊı¾İ
+	//è¯»512 Byteæ•°æ®
 	command[0]= 0x00;
 	command[1]= 0x00;
 	command[2]= 0x00;
@@ -253,7 +253,7 @@ static inline void SD_ReadResponse(void)
 // this is only used once, in the function directly below, response is always discarded - cory1492
 static inline void SD_WaitOK()
 {
-	//µÈ´ıÆğÊ¼±êÖ¾Î»ÖÃ
+	//ç­‰å¾…èµ·å§‹æ ‡å¿—ä½ç½®
 	uint32 temp,temp1;
 	command[0]= 0x00;
 	command[1]= 0x00;
