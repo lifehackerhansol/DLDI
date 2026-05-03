@@ -77,8 +77,8 @@ void dsd_send_sd_cmd( u8 cmd, u32 arg )
 		for( j = 0; j < 8; ++j )
 		{
 			u8 cmd_bit = (cmd_buf[i] >> (7-j)) & 0x01;
-			ds_cmd[j] = 0xAF | (cmd_bit<<4); // 0xA0 ��ʾ������ȫF��
-			                                 // ����hzΪ1��ָ��hzΪ0��������normalΪ1
+			ds_cmd[j] = 0xAF | (cmd_bit<<4); // 0xA0 表示数据线全F，
+			                                 // 数据hz为1，指令hz为0，不返回normal为1
 		}
 		//wait_press_b();
 		dsd_write_ds_cmd( ds_cmd );
