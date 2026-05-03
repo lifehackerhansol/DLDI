@@ -7,11 +7,11 @@
     SPDX-License-Identifier: Zlib
 */
 
-#include <nds/ndstypes.h>
-#include <libtwl/card/card.h>
+#include "gmtf.h"
 #include <common/libtwl_ext.h>
 #include <common/sdio.h>
-#include "gmtf.h"
+#include <libtwl/card/card.h>
+#include <nds/ndstypes.h>
 
 static bool isSdhc = false;
 
@@ -30,15 +30,13 @@ static u16 GMTF_SpiReadShort(void) {
     return res;
 }
 
-static void GMTF_SpiDisable(void)
-{
+static void GMTF_SpiDisable(void) {
     // Dummy SPI read to release CS
     card_spiTransferLastByte(MCCNT0_SPI_RATE_4_19_MHZ, GMTF_SPI_READ_BYTE);
     GMTF_CardSendCommandF2(0, GMTF_CMD_F2_SPI_DISABLE);
 }
 
-static void GMTF_SpiEnable(void)
-{
+static void GMTF_SpiEnable(void) {
     GMTF_CardSendCommandF2(0, GMTF_CMD_F2_SPI_ENABLE);
 }
 
@@ -56,8 +54,7 @@ static u8 GMTF_SpiReadByteTimeout(void) {
 }
 
 // Sends SDIO command to ARDS.
-static u8 GMTF_SpiSendSDIOCommand(u8 cmdId, u32 arg, u8 * buffer, int len)
-{
+static u8 GMTF_SpiSendSDIOCommand(u8 cmdId, u32 arg, u8* buffer, int len) {
     uint8_t cmd[6];
 
     GMTF_SpiReinitialize();
@@ -75,26 +72,22 @@ static u8 GMTF_SpiSendSDIOCommand(u8 cmdId, u32 arg, u8 * buffer, int len)
 
     u8 timeout = GMTF_SpiReadByteTimeout();
 
-    const u8 * target = buffer == NULL ? NULL : (buffer + len);
-    for(int i=0; i < len; i++)
-    {
+    const u8* target = buffer == NULL ? NULL : (buffer + len);
+    for (int i = 0; i < len; i++) {
         u8 data = GMTF_SpiReadByte();
-        if(buffer < target)
-            *buffer++ = data;
+        if (buffer < target) *buffer++ = data;
     }
 
     return timeout;
 }
 
-static u8 GMTF_SpiSendSDIOCommandR0(u8 cmd, u32 arg)
-{
+static u8 GMTF_SpiSendSDIOCommandR0(u8 cmd, u32 arg) {
     return GMTF_SpiSendSDIOCommand(cmd, arg, NULL, 0);
 }
 
 #define GMTF_MAX_STARTUP_TRIES 5000
 
-bool GMTF_SDInitialize(void)
-{
+bool GMTF_SDInitialize(void) {
     bool isv2 = false;
     for (int i = 0; i < 0x100; i++) {
         GMTF_CardSendCommandF2(0x7FFFFFFF | ((i & 1) << 31), 0x00);
@@ -139,21 +132,19 @@ bool GMTF_SDInitialize(void)
     return true;
 }
 
-static bool GMTF_readSector(u8 * buffer) {
+static bool GMTF_readSector(u8* buffer) {
     // Wait for data start token
-    if(GMTF_SpiReadByteTimeout() != GMTF_SPI_START_DATA_TOKEN) {
+    if (GMTF_SpiReadByteTimeout() != GMTF_SPI_START_DATA_TOKEN) {
         return false;
     }
 
-    if((u32)buffer & 1) {
+    if ((u32)buffer & 1) {
         // byte aligned
-        for(int i=0; i < 512; i++)
-            *buffer++ = GMTF_SpiReadByte();
+        for (int i = 0; i < 512; i++) *buffer++ = GMTF_SpiReadByte();
     } else {
         // halfword aligned
         u16* buffer16 = (u16*)buffer;
-        for(int i=0; i < (512 / sizeof(u16)); i++)
-            *buffer16++ = GMTF_SpiReadShort();
+        for (int i = 0; i < (512 / sizeof(u16)); i++) *buffer16++ = GMTF_SpiReadShort();
     }
 
     // Read crc
@@ -162,25 +153,21 @@ static bool GMTF_readSector(u8 * buffer) {
     return true;
 }
 
-bool GMTF_SDReadSingleSector(u32 sector, u8 * buffer) {
+bool GMTF_SDReadSingleSector(u32 sector, u8* buffer) {
     sector = isSdhc ? sector : sector << 9;
 
-    if(GMTF_SpiSendSDIOCommandR0(SDIO_CMD17_READ_SINGLE_BLOCK, sector) != 0)
-        return false;
+    if (GMTF_SpiSendSDIOCommandR0(SDIO_CMD17_READ_SINGLE_BLOCK, sector) != 0) return false;
 
     return GMTF_readSector(buffer);
 }
 
-bool GMTF_SDReadMultipleSector(u32 sector, u32 num_sectors, u8 * buffer) {
+bool GMTF_SDReadMultipleSector(u32 sector, u32 num_sectors, u8* buffer) {
     sector = isSdhc ? sector : sector << 9;
 
-    if(GMTF_SpiSendSDIOCommandR0(SDIO_CMD18_READ_MULTIPLE_BLOCK, sector) != 0)
-        return false;
+    if (GMTF_SpiSendSDIOCommandR0(SDIO_CMD18_READ_MULTIPLE_BLOCK, sector) != 0) return false;
 
-    for(int i=0; i < num_sectors; i++)
-    {
-        if(!GMTF_readSector(buffer))
-            return false;
+    for (int i = 0; i < num_sectors; i++) {
+        if (!GMTF_readSector(buffer)) return false;
 
         buffer += 512;
     }
@@ -196,28 +183,24 @@ bool GMTF_SDReadMultipleSector(u32 sector, u32 num_sectors, u8 * buffer) {
     return timeout != 0;
 }
 
-bool GMTF_SDWriteSingleSector(u32 sector, const u8 * buffer)
-{
+bool GMTF_SDWriteSingleSector(u32 sector, const u8* buffer) {
     sector = isSdhc ? sector : sector << 9;
 
     // this message needs 1 byte of extra clock before it starts waiting for the start token
-    if(GMTF_SpiSendSDIOCommand(SDIO_CMD24_WRITE_SINGLE_BLOCK, sector, NULL, 1) != 0)
-        return false;
+    if (GMTF_SpiSendSDIOCommand(SDIO_CMD24_WRITE_SINGLE_BLOCK, sector, NULL, 1) != 0) return false;
 
     // Send start token
     card_spiTransferByte(MCCNT0_SPI_RATE_4_19_MHZ, GMTF_SPI_START_DATA_TOKEN);
 
     // Send data
-    for (int i = 0; i < 512; i++)
-        card_spiTransferByte(MCCNT0_SPI_RATE_4_19_MHZ, *buffer++);
+    for (int i = 0; i < 512; i++) card_spiTransferByte(MCCNT0_SPI_RATE_4_19_MHZ, *buffer++);
 
     // Send fake CRC
     GMTF_SpiReadByte();
     GMTF_SpiReadByte();
 
     // Get data response
-    if((GMTF_SpiReadByte() & 0x0F) != GMTF_SD_WRITE_OK)
-        return false;
+    if ((GMTF_SpiReadByte() & 0x0F) != GMTF_SD_WRITE_OK) return false;
 
     // Wait for card to write data
     int timeout = GMTF_SD_WRITE_TIMEOUT_LEN;
@@ -226,35 +209,31 @@ bool GMTF_SDWriteSingleSector(u32 sector, const u8 * buffer)
     return timeout != 0;
 }
 
-bool GMTF_SDWriteMultipleSector(u32 sector, u32 num_sectors, const u8 * buffer) {
+bool GMTF_SDWriteMultipleSector(u32 sector, u32 num_sectors, const u8* buffer) {
     sector = isSdhc ? sector : sector << 9;
 
     // this message needs 1 byte of extra clock before it starts waiting for the start token
-    if(GMTF_SpiSendSDIOCommand(SDIO_CMD25_WRITE_MULTIPLE_BLOCK, sector, NULL, 1) != 0)
+    if (GMTF_SpiSendSDIOCommand(SDIO_CMD25_WRITE_MULTIPLE_BLOCK, sector, NULL, 1) != 0)
         return false;
 
-    for(int i=0; i < num_sectors; i++)
-    {
+    for (int i = 0; i < num_sectors; i++) {
         // Send start token
         card_spiTransferByte(MCCNT0_SPI_RATE_4_19_MHZ, GMTF_SPI_MULTI_BLOCK_WRITE_TOKEN);
 
         // Send data
-        for (int j = 0; j < 512; j++)
-            card_spiTransferByte(MCCNT0_SPI_RATE_4_19_MHZ, *buffer++);
+        for (int j = 0; j < 512; j++) card_spiTransferByte(MCCNT0_SPI_RATE_4_19_MHZ, *buffer++);
 
         // Send fake CRC
         GMTF_SpiReadByte();
         GMTF_SpiReadByte();
 
         // Get data response
-        if((GMTF_SpiReadByte() & 0x0F) != GMTF_SD_WRITE_OK)
-            return false;
+        if ((GMTF_SpiReadByte() & 0x0F) != GMTF_SD_WRITE_OK) return false;
 
         // Wait for card to write data
         int timeout = GMTF_SD_WRITE_TIMEOUT_LEN;
         while (GMTF_SpiReadByte() == 0 && --timeout > 0);
-        if(!timeout)
-            return false;
+        if (!timeout) return false;
     }
 
     // send stop token

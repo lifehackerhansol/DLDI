@@ -73,16 +73,16 @@ void EZ5N_SDWriteSectors(u32 sector, u32 num_sectors, const void* buffer);
 u32 EZ5N_CardReadHWVersion(void);
 
 /*
-    The format of the table to send is two u32[64] arrays, which 
+    The format of the table to send is two u32[64] arrays, which
     contains the offsets for two files, the first for the ROM, the second
     for the save file.
     Each array has two u32s:
     - u32 fileOffset - file offset of the given SD sector
     - u32 sectorBase - sector address relative to the file offset
-    When the fileOffset == 0xFFFFFFFF, the card will consider the previous 
+    When the fileOffset == 0xFFFFFFFF, the card will consider the previous
     sectorBase as the final FAT cluster.
 
-    The "ROM" file offsets are read using 0xB6 and 0xB7, while the "save" 
+    The "ROM" file offsets are read using 0xB6 and 0xB7, while the "save"
     file offsets are read using 0xB2 and 0xB3, and written using 0xBD and 0xBE.
 */
 void EZ5N_SendFATOffsetTable(const u32* table, u32 num_words);

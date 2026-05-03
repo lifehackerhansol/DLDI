@@ -9,8 +9,8 @@
 
 #pragma once
 
-#include <nds/ndstypes.h>
 #include <libtwl/card/card.h>
+#include <nds/ndstypes.h>
 
 #ifndef NULL
 #define NULL 0
@@ -26,7 +26,9 @@
 #define GMTF_SPI_MULTI_BLOCK_WRITE_TOKEN 0xFC
 #define GMTF_SPI_END_MULTI_BLOCK_WRITE 0xFD
 
-#define GMTF_CTRL_BASE (MCCNT1_RESET_OFF | MCCNT1_CMD_SCRAMBLE | MCCNT1_READ_DATA_DESCRAMBLE | MCCNT1_CLOCK_SCRAMBLER | MCCNT1_LATENCY2(0x3F))
+#define GMTF_CTRL_BASE                                                      \
+    (MCCNT1_RESET_OFF | MCCNT1_CMD_SCRAMBLE | MCCNT1_READ_DATA_DESCRAMBLE | \
+     MCCNT1_CLOCK_SCRAMBLER | MCCNT1_LATENCY2(0x3F))
 
 #define GMTF_CMD_F2_SPI_ENABLE 0xCC
 #define GMTF_CMD_F2_SPI_DISABLE 0xC8
@@ -38,7 +40,7 @@ static inline u64 GMTF_CMD_F2(u32 param1, u8 param2) {
 // User API
 
 bool GMTF_SDInitialize(void);
-bool GMTF_SDReadSingleSector(u32 sector, u8 * buffer);
-bool GMTF_SDReadMultipleSector(u32 sector, u32 num_sectors, u8 * buffer);
-bool GMTF_SDWriteSingleSector(u32 sector, const u8 * buffer);
-bool GMTF_SDWriteMultipleSector(u32 sector, u32 num_sectors, const u8 * buffer);
+bool GMTF_SDReadSingleSector(u32 sector, u8* buffer);
+bool GMTF_SDReadMultipleSector(u32 sector, u32 num_sectors, u8* buffer);
+bool GMTF_SDWriteSingleSector(u32 sector, const u8* buffer);
+bool GMTF_SDWriteMultipleSector(u32 sector, u32 num_sectors, const u8* buffer);

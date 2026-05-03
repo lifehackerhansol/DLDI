@@ -4,8 +4,8 @@
     SPDX-License-Identifier: Zlib
 */
 
-#include <nds/ndstypes.h>
 #include <libtwl/card/card.h>
+#include <nds/ndstypes.h>
 
 void cardExt_RomReadData(u64 command, u32 flags, void* buffer, u32 length) {
     card_romSetCmd(command);

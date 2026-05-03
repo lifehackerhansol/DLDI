@@ -69,8 +69,8 @@ u32 EZ5N_GetVersion(void) {
 }
 
 void EZ5N_SendFATOffsetTable(const u32* table, u32 num_words) {
-    cardExt_RomWriteData(EZ5N_CMD_SD_SEND_FAT_OFFSET_TABLE, (EZ5N_CTRL_WRITE_SD | MCCNT1_LEN_512), table,
-                         num_words);
+    cardExt_RomWriteData(EZ5N_CMD_SD_SEND_FAT_OFFSET_TABLE, (EZ5N_CTRL_WRITE_SD | MCCNT1_LEN_512),
+                         table, num_words);
 }
 
 #endif
