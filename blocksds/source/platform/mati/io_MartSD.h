@@ -1,3 +1,5 @@
+// clang-format off
+
 #ifndef IO_MARTSD_H_
 #define IO_MARTSD_H_
 

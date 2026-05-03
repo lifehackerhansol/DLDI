@@ -1,3 +1,4 @@
+// clang-format off
 /*
     EZ5 DLDI driver
     Copyright (C) 2007 SaTa
