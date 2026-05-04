@@ -10,6 +10,7 @@
 /* Spread lower 32 bits into 64 bits */
 /* x =     **** **** **** **** abcd efgh ijkl mnop */
 /* result: a0b0 c0d0 e0f0 g0h0 i0j0 k0l0 m0n0 o0p0 */
+__attribute__((optimize("O3")))
 static uint64_t __sd_crc16_spread(uint64_t x)
 {
 	x = (x << 16 | x) & 0x0000FFFF0000FFFF;
@@ -29,6 +30,7 @@ static uint64_t __sd_crc16_shuffle(uint32_t x, uint32_t y)
 	return __sd_crc16_spread(x) << 1 | __sd_crc16_spread(y);
 }
 
+__attribute__((optimize("O3")))
 uint64_t __sd_crc16(const uint8_t *src)
 {
 	int i;
