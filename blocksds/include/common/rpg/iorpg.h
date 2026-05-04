@@ -75,13 +75,13 @@ static inline u64 IORPG_CMD_SDIO(u8 sdio, u8 param_type, u32 parameter) {
 static inline u64 IORPG_CMD_SD_WRITE_DATA(const u32* buffer) {
     u64 command;
     if ((u32)buffer & 0x3) {
-        command = (((u64)__builtin_bswap32(buffer[0]) << 32) | ((u64)__builtin_bswap32(buffer[1])));
-    } else {
         u8* u8_buffer = (u8*)buffer;
         command =
                 (((u64)u8_buffer[0] << 56) | ((u64)u8_buffer[1] << 48) | ((u64)u8_buffer[2] << 40) |
                  ((u64)u8_buffer[3] << 32) | ((u64)u8_buffer[4] << 24) | ((u64)u8_buffer[5] << 16) |
                  ((u64)u8_buffer[6] << 8) | ((u64)u8_buffer[7]));
+    } else {
+        command = (((u64)__builtin_bswap32(buffer[0]) << 32) | ((u64)__builtin_bswap32(buffer[1])));
     }
     return command;
 }
